@@ -1,0 +1,4 @@
+# ninja log v5
+1	8355	1752656980511858061	/data1/yjx/for_cvpr_2026/2d-gaussian-splatting/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/simple_knn.o	c749e42490e3c189
+0	12894	1752656985051025090	/data1/yjx/for_cvpr_2026/2d-gaussian-splatting/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/ext.o	af1cf44fa739922e
+1	34895	1752657007051823447	/data1/yjx/for_cvpr_2026/2d-gaussian-splatting/submodules/simple-knn/build/temp.linux-x86_64-cpython-38/spatial.o	f251f54339eb425
