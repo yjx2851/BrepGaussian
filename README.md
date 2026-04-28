@@ -1,6 +1,5 @@
 # Paper Code Release
 
-> **Note:** This repository is **under active development**;   we are currently organizing and cleaning the codebase.
 
 
 This repository contains the code for our paper. The pipeline is: two-stage training (`train_stage1` → `train_stage2`) on a customized **3D Gaussian Splatting** variant, producing a semantically labeled point cloud, then **B-Rep** fitting of analytic planes/cylinders, wireframes, and surface meshes.
@@ -73,6 +72,15 @@ For module overview and algorithms, see **`BRep/README.md`**. Below is the **usa
 
 ```bash
 pip install numpy scipy scikit-learn open3d trimesh shapely
+```
+
+### 4.2 Run surface fitting pipeline
+
+Run from the **`BRep/`** directory:
+
+```bash
+cd BRep
+python surface_fitting_pipeline.py --pcd ../00000699_stage2/merged.pcd --output ../00000699_Brep
 ```
 
 

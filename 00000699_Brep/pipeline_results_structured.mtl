@@ -1,0 +1,13 @@
+newmtl line_blue
+Kd 0.0 0.0 1.0
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl point_red
+Kd 1.0 0.0 0.0
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1

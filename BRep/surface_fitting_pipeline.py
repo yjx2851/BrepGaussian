@@ -3,6 +3,7 @@ import numpy as np
 import open3d as o3d
 import sys
 import os
+from typing import Optional
 
 sys.path.append(os.path.dirname(__file__))
 from ransac_surface_fitting import (
@@ -974,7 +975,7 @@ def visualize_final_geometry(corners: list, lines: list, curves: list = None,
 def export_final_obj(corners: list, lines: list, output_dir: str,
                      line_radius: float = 0.005, sphere_radius: float = 0.01,
                      filename: str = "pipeline_results.obj",
-                     curves: list | None = None):
+                     curves: Optional[list] = None):
     """
     导出最终结果为一个 OBJ 模型：
       - 线段: 蓝色细圆柱
@@ -1077,7 +1078,7 @@ def export_final_obj(corners: list, lines: list, output_dir: str,
 
 def export_parts_objs(corners: list, lines: list, output_dir: str,
                       line_radius: float = 0.005, sphere_radius: float = 0.01,
-                      curves: list | None = None,
+                      curves: Optional[list] = None,
                       subdir: str = "parts"):
     """
     导出分部件 OBJ：
@@ -1169,7 +1170,7 @@ def export_parts_objs(corners: list, lines: list, output_dir: str,
 
 
 def export_structured_obj(corners: list, lines: list, output_dir: str,
-                          curves: list | None = None,
+                          curves: Optional[list] = None,
                           line_radius: float = 0.005, sphere_radius: float = 0.01,
                           filename: str = "pipeline_results_structured.obj",
                           mtl_name: str = "pipeline_results_structured.mtl"):
