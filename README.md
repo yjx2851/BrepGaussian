@@ -1,4 +1,7 @@
-# Paper Code Release
+# BrepGaussian: CAD reconstruction from Multi-View Images with Gaussian Splatting
+
+> **News:** This work has been accepted to **CVPR 2026**.
+
 
 
 
