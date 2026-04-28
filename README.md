@@ -7,7 +7,7 @@
 
 This repository contains the code for our paper. The pipeline is: two-stage training (`train_stage1` → `train_stage2`) on a customized **3D Gaussian Splatting** variant, producing a semantically labeled point cloud, then **B-Rep** fitting of analytic planes/cylinders, wireframes, and surface meshes.
 
-The environment matches official [3D Gaussian Splatting](https://github.com/graphdeco-inria/gaussian-splatting): use **Linux**, **CUDA**, and **PyTorch** (match your CUDA version). Install COLMAP / data preprocessing and other dependencies as in the original 3DGS release.
+The environment matches official [3D Gaussian Splatting](https://github.com/graphdeco-inria/gaussian-splatting).
 
 ---
 
