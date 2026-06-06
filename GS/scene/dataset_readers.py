@@ -234,7 +234,7 @@ def readCamerasFromTransforms(path, transformsfile, white_background,extension="
             mask_name=os.path.join(path,frame["mask_path"])
             mask_path=os.path.join(path,mask_name + extension)
             mask_image = Image.open(mask_path).convert("RGBA")
-            # TODO 存在漏洞
+
             mask_image = np.array(mask_image)[:,:,:1].squeeze(-1)
             mask_image = Image.fromarray(mask_image, "L")
 
