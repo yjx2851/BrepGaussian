@@ -1,1 +1,0 @@
-Namespace(data_device='cuda', eval=False, images='images', model_path='./ABC-NEF-origin-2DGS/00009581_stage2', render_items=['RGB', 'Alpha', 'Normal', 'Depth', 'Edge', 'Curvature'], resolution=-1, sh_degree=3, source_path='/data1/yjx/research_data/ABC-NEF-origin/00009581', white_background=False)

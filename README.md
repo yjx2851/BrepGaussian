@@ -35,7 +35,35 @@ The end-to-end example below uses the following paths (relative to the repo root
 
 | Path | Description |
 |------|-------------|
-| `00000699/` | Scene data (e.g. `transforms_train.json`, same CLI conventions as original 3DGS) |
+| `00000699/` | Scene data (`transforms_train.json` + multi-view supervision images; same CLI conventions as original 3DGS) |
+
+Each scene directory is expected to contain the subfolders below. In `transforms_train.json`, each frame's `file_path` points to `./train_img/<id>_colors`; companion images are resolved by replacing `train_img` with the corresponding folder name (see `GS/scene/dataset_readers.py`).
+
+| Folder | Used in training | Role |
+|------|------------------|------|
+| `train_img/` | Stage 1 & 2 | RGB multi-view renders (photometric supervision) |
+| `edge_img/` | Stage 1 & 2 | Edge maps (edge supervision) |
+| `mask_img/` | Stage 2 | Per-face instance masks (segmentation / feature supervision) |
+| `corner_img/` | — | Placeholder only (see below) |
+| `line_mask_img/` | — | Placeholder only (see below) |
+
+### 2.1 Data preprocessing
+
+#### `train_img` and `edge_img`
+
+Generate these by following the **rendering logic and data processing** in [NEF_code](https://github.com/yunfan1202/NEF_code). The released training code expects the same multi-view layout and naming convention (`<view_id>_colors.png` under each subfolder).
+
+#### `mask_img`
+
+Per-face masks are obtained with a **fine-tuned SAM** model:
+
+1. Download the checkpoint from [BrepGuassianMask on Hugging Face](https://huggingface.co/yjx2851/BrepGuassianMask).
+2. The model is fine-tuned on top of [Segment Anything (SAM)](https://github.com/facebookresearch/segment-anything); install SAM and load the provided weights following the SAM inference API.
+3. Run inference on each image in `train_img/` to produce the corresponding masks in `mask_img/` (same view IDs and resolution). These masks are used in **Stage 2** for instance-level feature learning.
+
+#### `corner_img` and `line_mask_img` (placeholders)
+
+We also ship `corner_img/` and `line_mask_img/` as auxiliary data that *may* be useful for label acquisition in future work. **They are not used** in the current training pipeline (`train_stage1.py` / `train_stage2.py`); the folders are included for completeness only.
 
 The following commands assume you work from the **repository root**; training scripts live under **`GS/`**. As in the original Gaussian Splatting code, **`-s`** is the scene path and **`-m`** is the **base** output path (the scripts append `_stage1` / `_stage2` automatically).
 
