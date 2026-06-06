@@ -1,8 +1,8 @@
 # BrepGaussian: CAD reconstruction from Multi-View Images with Gaussian Splatting
-
-> **Accepted to CVPR 2026**
+ 
+> 🎉 **Accepted to CVPR 2026** 🎉
 >
-> We are pleased to announce that **BrepGaussian** has been **accepted** to the **IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026**. This repository provides the official implementation released with the paper.
+> 📢 We are pleased to announce that **BrepGaussian** has been **accepted** ✅ to the **IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026**. 📄 The paper is available on [arXiv](https://arxiv.org/abs/2602.21105). 💻 This repository provides the official implementation released with the paper.
 
 <p align="center">
   <img src="data/pipeline.png" alt="BrepGaussian pipeline overview" width="95%">
@@ -89,6 +89,10 @@ Run from the **`BRep/`** directory:
 ```bash
 cd BRep
 python surface_fitting_pipeline.py --pcd ../00000699_stage2/merged.pcd --output ../00000699_Brep
+
+or
+
+python surface_fitting_pipeline.py   --pcd ../data/00000699_stage2/merged.pcd   --output ../00000699_Brep   --no_visualize
 ```
 
 
