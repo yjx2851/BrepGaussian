@@ -63,7 +63,7 @@ Per-face masks are obtained with a **fine-tuned SAM** model:
 
 #### `corner_img` and `line_mask_img` (placeholders)
 
-We also ship `corner_img/` and `line_mask_img/` as auxiliary data that *may* be useful for label acquisition in future work. **They are not used** in the current training pipeline (`train_stage1.py` / `train_stage2.py`); the folders are included for completeness only.
+We also ship `corner_img/` and `line_mask_img/` as auxiliary data that may be useful for label acquisition in future work. **They are not used** in the current training pipeline (`train_stage1.py` / `train_stage2.py`); the folders are included for completeness only.
 
 The following commands assume you work from the **repository root**; training scripts live under **`GS/`**. As in the original Gaussian Splatting code, **`-s`** is the scene path and **`-m`** is the **base** output path (the scripts append `_stage1` / `_stage2` automatically).
 
