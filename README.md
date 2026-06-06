@@ -1,9 +1,14 @@
 # BrepGaussian: CAD reconstruction from Multi-View Images with Gaussian Splatting
 
-> **News:** This work has been accepted to **CVPR 2026**.
+> **Accepted to CVPR 2026**
+>
+> We are pleased to announce that **BrepGaussian** has been **accepted** to the **IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) 2026**. This repository provides the official implementation released with the paper.
 
+<p align="center">
+  <img src="data/pipeline.png" alt="BrepGaussian pipeline overview" width="95%">
+</p>
 
-
+---
 
 This repository contains the code for our paper. The pipeline is: two-stage training (`train_stage1` → `train_stage2`) on a customized **3D Gaussian Splatting** variant, producing a semantically labeled point cloud, then **B-Rep** fitting of analytic planes/cylinders, wireframes, and surface meshes.
 
