@@ -1119,7 +1119,7 @@ def point_2d_to_3d_cylinder(pt_2d: np.ndarray, axis: np.ndarray, center: np.ndar
 
 def process_surface(surface: dict, lines: List[dict], curves: List[dict], 
                    corners: List[List[float]], output_dir: str, 
-                   surface_idx: int) -> Optional[o3d.geometry.TriangleMesh]:
+                   surface_idx: int, verbose: bool = True) -> Optional[o3d.geometry.TriangleMesh]:
     """
     处理单个面，生成面片网格
     """
@@ -1135,7 +1135,8 @@ def process_surface(surface: dict, lines: List[dict], curves: List[dict],
         
         normal = normal / (np.linalg.norm(normal) + 1e-12)
         
-        print(f"\n处理面 {surface_idx} (平面)")
+        if verbose:
+            print(f"\n处理面 {surface_idx} (平面)")
         
         u, v = build_2d_coordinate_system(normal)
         
@@ -1307,7 +1308,8 @@ def process_surface(surface: dict, lines: List[dict], curves: List[dict],
         axis_normalized = axis / axis_len
         center = (top_center + bottom_center) / 2
         
-        print(f"\n处理面 {surface_idx} (柱面)")
+        if verbose:
+            print(f"\n处理面 {surface_idx} (柱面)")
         
         relevant_circles = []
         for curve in curves:

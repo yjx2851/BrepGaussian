@@ -3,7 +3,8 @@ import numpy as np
 import open3d as o3d
 import sys
 import os
-from typing import Optional
+import colorsys
+from typing import Optional, List
 
 sys.path.append(os.path.dirname(__file__))
 from ransac_surface_fitting import (
@@ -14,6 +15,7 @@ from ransac_surface_fitting import (
     are_surfaces_similar_with_debug,
     get_plane_cylinder_intersection
 )
+from json_to_surface_patches import process_surface
 
 
 def read_pcd_edge_points(pcd_path: str) -> np.ndarray:
@@ -972,12 +974,31 @@ def visualize_final_geometry(corners: list, lines: list, curves: list = None,
     )
 
 
+def get_face_light_color(face_idx: int) -> np.ndarray:
+    """为每个面片生成互不相同的浅色（低饱和度、高明度）。"""
+    hue = (face_idx * 0.618033988749895) % 1.0
+    r, g, b = colorsys.hsv_to_rgb(hue, 0.30, 0.96)
+    return np.array([r, g, b], dtype=float)
+
+
+def build_surface_meshes(surfaces: list, lines: list, curves: list,
+                         corners: list) -> List[Optional[o3d.geometry.TriangleMesh]]:
+    """为每个解析面生成三角网格（平面/柱面）。"""
+    meshes: List[Optional[o3d.geometry.TriangleMesh]] = []
+    for i, surface in enumerate(surfaces):
+        mesh = process_surface(surface, lines, curves, corners, output_dir="", surface_idx=i, verbose=False)
+        meshes.append(mesh)
+    return meshes
+
+
 def export_final_obj(corners: list, lines: list, output_dir: str,
                      line_radius: float = 0.005, sphere_radius: float = 0.01,
                      filename: str = "pipeline_results.obj",
-                     curves: Optional[list] = None):
+                     curves: Optional[list] = None,
+                     surface_meshes: Optional[List[Optional[o3d.geometry.TriangleMesh]]] = None):
     """
     导出最终结果为一个 OBJ 模型：
+      - 面: 浅色三角面片（各面颜色不同）
       - 线段: 蓝色细圆柱
       - 角点: 红色小球
     OBJ 保存在与 JSON 相同目录。
@@ -987,6 +1008,21 @@ def export_final_obj(corners: list, lines: list, output_dir: str,
     all_triangles = []
     all_colors = []
     vert_offset = 0
+
+    # 面片（各面不同浅色）
+    if surface_meshes:
+        for idx, mesh in enumerate(surface_meshes):
+            if mesh is None:
+                continue
+            color = get_face_light_color(idx)
+            mesh.paint_uniform_color(color)
+            v = np.asarray(mesh.vertices)
+            f = np.asarray(mesh.triangles)
+            c = np.asarray(mesh.vertex_colors) if mesh.has_vertex_colors() else np.tile(color.reshape(1, 3), (len(v), 1))
+            all_vertices.append(v)
+            all_triangles.append(f + vert_offset)
+            all_colors.append(c)
+            vert_offset += len(v)
 
     # 线段（蓝色）
     for line in lines:
@@ -1073,21 +1109,39 @@ def export_final_obj(corners: list, lines: list, output_dir: str,
     except Exception:
         pass
     o3d.io.write_triangle_mesh(obj_path, mesh, write_vertex_normals=False)
-    print(f"  最终 OBJ 已保存: {obj_path}")
 
 
 def export_parts_objs(corners: list, lines: list, output_dir: str,
                       line_radius: float = 0.005, sphere_radius: float = 0.01,
                       curves: Optional[list] = None,
+                      surface_meshes: Optional[List[Optional[o3d.geometry.TriangleMesh]]] = None,
                       subdir: str = "parts"):
     """
     导出分部件 OBJ：
+      - parts/face_XXXXX.obj：每个面单独保存
       - parts/lines.obj：蓝色细圆柱（包含直线与曲线）
       - parts/points.obj：红色小球
     """
     corners_np = [np.asarray(c, dtype=float) for c in corners]
     parts_dir = os.path.join(output_dir, subdir)
     os.makedirs(parts_dir, exist_ok=True)
+
+    # 每个面单独导出
+    if surface_meshes:
+        face_count = 0
+        for idx, mesh in enumerate(surface_meshes):
+            if mesh is None:
+                continue
+            color = get_face_light_color(idx)
+            mesh.paint_uniform_color(color)
+            face_path = os.path.join(parts_dir, f"face_{idx:05d}.obj")
+            try:
+                mesh_copy = o3d.geometry.TriangleMesh(mesh)
+                mesh_copy.triangle_normals = o3d.utility.Vector3dVector()
+            except Exception:
+                mesh_copy = mesh
+            o3d.io.write_triangle_mesh(face_path, mesh_copy, write_vertex_normals=False)
+            face_count += 1
 
     # 构建 lines mesh
     all_v_l, all_f_l, all_c_l = [], [], []
@@ -1140,9 +1194,6 @@ def export_parts_objs(corners: list, lines: list, output_dir: str,
         except Exception:
             pass
         o3d.io.write_triangle_mesh(os.path.join(parts_dir, "lines.obj"), mesh_l, write_vertex_normals=False)
-        print(f"  分部件 OBJ 已保存: {os.path.join(parts_dir, 'lines.obj')}")
-    else:
-        print("  提示: 无线条几何可导出到 parts/lines.obj")
 
     # 构建 points mesh
     all_v_p, all_f_p, all_c_p = [], [], []
@@ -1164,20 +1215,18 @@ def export_parts_objs(corners: list, lines: list, output_dir: str,
         except Exception:
             pass
         o3d.io.write_triangle_mesh(os.path.join(parts_dir, "points.obj"), mesh_p, write_vertex_normals=False)
-        print(f"  分部件 OBJ 已保存: {os.path.join(parts_dir, 'points.obj')}")
-    else:
-        print("  提示: 无角点几何可导出到 parts/points.obj")
 
 
 def export_structured_obj(corners: list, lines: list, output_dir: str,
                           curves: Optional[list] = None,
+                          surface_meshes: Optional[List[Optional[o3d.geometry.TriangleMesh]]] = None,
                           line_radius: float = 0.005, sphere_radius: float = 0.01,
                           filename: str = "pipeline_results_structured.obj",
                           mtl_name: str = "pipeline_results_structured.mtl"):
     """
     导出一个结构化的 OBJ：
-      - 单文件，包含多个 object（o name）：每条线、每个点一个独立 object
-      - 使用 MTL 材质区分：线/曲线=蓝色，点=红色
+      - 单文件，包含多个 object（o name）：每个面、每条线、每个点一个独立 object
+      - 使用 MTL 材质区分：面=各面不同浅色，线/曲线=蓝色，点=红色
     便于在 Blender 中按对象编辑。
     """
     corners_np = [np.asarray(c, dtype=float) for c in corners]
@@ -1199,6 +1248,17 @@ def export_structured_obj(corners: list, lines: list, output_dir: str,
             a, b, c = tri + 1 + v_offset
             obj_lines.append(f"f {a} {b} {c}\n")
         v_offset += len(v)
+
+    # 面对象（各面不同浅色材质）
+    face_materials = []
+    if surface_meshes:
+        for idx, mesh in enumerate(surface_meshes):
+            if mesh is None:
+                continue
+            mtl_name_face = f"face_{idx:05d}"
+            color = get_face_light_color(idx)
+            write_mesh_as_object(f"face_{idx:05d}", mesh, mtl_name_face)
+            face_materials.append((mtl_name_face, color))
 
     # 线段对象
     for idx, line in enumerate(lines):
@@ -1244,11 +1304,20 @@ def export_structured_obj(corners: list, lines: list, output_dir: str,
     obj_path = os.path.join(output_dir, filename)
     with open(obj_path, "w", encoding="utf-8") as f:
         f.writelines(obj_lines)
-    print(f"  结构化 OBJ 已保存: {obj_path}")
 
     # 输出 MTL
     mtl_path = os.path.join(output_dir, mtl_name)
-    mtl_lines = [
+    mtl_lines = []
+    for mtl_name_face, color in face_materials:
+        mtl_lines.extend([
+            f"newmtl {mtl_name_face}\n",
+            f"Kd {color[0]:.4f} {color[1]:.4f} {color[2]:.4f}\n",
+            "Ka 0.0 0.0 0.0\n",
+            "Ks 0.0 0.0 0.0\n",
+            "d 1.0\n",
+            "illum 1\n\n",
+        ])
+    mtl_lines.extend([
         "newmtl line_blue\n",
         "Kd 0.0 0.0 1.0\n",
         "Ka 0.0 0.0 0.0\n",
@@ -1261,10 +1330,9 @@ def export_structured_obj(corners: list, lines: list, output_dir: str,
         "Ks 0.0 0.0 0.0\n",
         "d 1.0\n",
         "illum 1\n"
-    ]
+    ])
     with open(mtl_path, "w", encoding="utf-8") as f:
         f.writelines(mtl_lines)
-    print(f"  MTL 已保存: {mtl_path}")
 
 
 def debug_check_final_alignment(segmented: list, corners: list, lines: list):
@@ -1851,26 +1919,38 @@ def run_pipeline(pcd_path: str, output_dir: str = "pipeline_output",
 
     # 导出最终 OBJ（与 JSON 同目录）
     try:
+        surface_meshes = build_surface_meshes(
+            results_summary['surfaces'],
+            results_summary['lines'],
+            results_summary.get('curves', []),
+            results_summary['corners'],
+        )
         export_final_obj(corners, indexed_lines, output_dir,
                          line_radius=0.005, sphere_radius=0.01,
                          filename="pipeline_results.obj",
-                         curves=results_summary.get('curves', []))
+                         curves=results_summary.get('curves', []),
+                         surface_meshes=surface_meshes)
         # 结构化导出
         export_parts_objs(corners, indexed_lines, output_dir,
                           line_radius=0.005, sphere_radius=0.01,
                           curves=results_summary.get('curves', []),
+                          surface_meshes=surface_meshes,
                           subdir="parts")
-        # 单文件结构化（每个点/线/曲线独立 object）
+        # 单文件结构化（每个面/点/线/曲线独立 object）
         export_structured_obj(
             corners,
             indexed_lines,
             output_dir,
             curves=results_summary.get('curves', []),
+            surface_meshes=surface_meshes,
             line_radius=0.005,
             sphere_radius=0.01,
             filename="pipeline_results_structured.obj",
             mtl_name="pipeline_results_structured.mtl"
         )
+        face_ok = sum(1 for m in surface_meshes if m is not None)
+        print(f"  面片 OBJ: {face_ok}/{len(surface_meshes)} 个面已导出至 parts/face_*.obj")
+        print(f"  合并 OBJ: pipeline_results.obj, pipeline_results_structured.obj")
     except Exception as e:
         print(f"  警告: 导出 OBJ 失败: {e}")
     
