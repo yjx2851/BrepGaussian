@@ -1,0 +1,69 @@
+newmtl face_00000
+Kd 0.9600 0.6720 0.6720
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00001
+Kd 0.6720 0.7560 0.9600
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00002
+Kd 0.8401 0.9600 0.6720
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00003
+Kd 0.9600 0.6720 0.9241
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00004
+Kd 0.6720 0.9600 0.9119
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00005
+Kd 0.9600 0.8278 0.6720
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00006
+Kd 0.7438 0.6720 0.9600
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl face_00007
+Kd 0.6843 0.9600 0.6720
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl line_blue
+Kd 0.0 0.0 1.0
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1
+
+newmtl point_red
+Kd 1.0 0.0 0.0
+Ka 0.0 0.0 0.0
+Ks 0.0 0.0 0.0
+d 1.0
+illum 1

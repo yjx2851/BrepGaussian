@@ -57,7 +57,7 @@ Generate these by following the **rendering logic and data processing** in [NEF_
 
 Per-face masks are obtained with a **fine-tuned SAM** model:
 
-1. Download the checkpoint from [BrepGuassianMask on Hugging Face](https://huggingface.co/yjx2851/BrepGuassianMask).
+1. Download the checkpoint from [BrepGuassianMask on ModelScope](https://www.modelscope.cn/models/yjx2851/BrepGaussianMask).
 2. The model is fine-tuned on top of [Segment Anything (SAM)](https://github.com/facebookresearch/segment-anything); install SAM and load the provided weights following the SAM inference API.
 3. Run inference on each image in `train_img/` to produce the corresponding masks in `mask_img/` (same view IDs and resolution). These masks are used in **Stage 2** for instance-level feature learning.
 
